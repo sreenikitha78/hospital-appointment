@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Appointment System</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f2f7fa;
+        }
+
+        header {
+            background: #087e8b;
+            color: white;
+            text-align: center;
+            padding: 25px;
+        }
+
+        nav {
+            background: #075c66;
+            padding: 15px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 15px;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 25px auto;
+            padding: 20px;
+        }
+
+        .doctor {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ccc;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 6px;
+        }
+
+        button {
+            background: #087e8b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        footer {
+            background: #075c66;
+            color: white;
+            text-align: center;
+            padding: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>City Care Hospital</h1>
+    <p>Online Hospital Appointment Booking System</p>
+</header>
+
+<nav>
+    <a href="#home">Home</a>
+    <a href="#doctors">Doctors</a>
+    <a href="#booking">Book Appointment</a>
+</nav>
+
+<div class="container" id="home">
+
+    <h2>Welcome to City Care Hospital</h2>
+    <p>Find doctors, check availability and book appointments online.</p>
+
+    <h2 id="doctors">Our Doctors</h2>
+
+    <input type="text" id="search"
+    placeholder="Search doctor or specialization">
+
+    <button onclick="searchDoctors()">Search</button>
+
+    <div id="doctorList"></div>
+
+    <h2 id="booking">Book Appointment</h2>
+
+    <form onsubmit="bookAppointment(event)">
+        <input type="text" id="patient"
+        placeholder="Patient Name" required>
+
+        <input type="date" id="date" required>
+
+        <select id="doctor" required>
+            <option value="">Select Doctor</option>
+            <option>Dr. Anil Kumar</option>
+            <option>Dr. Priya Sharma</option>
+            <option>Dr. Rahul Reddy</option>
+        </select>
+
+        <select id="time" required>
+            <option value="">Select Time</option>
+            <option>10:00 AM</option>
+            <option>11:00 AM</option>
+            <option>02:00 PM</option>
+            <option>04:00 PM</option>
+        </select>
+
+        <button type="submit">Book Appointment</button>
+    </form>
+
+    <h2>My Appointments</h2>
+    <div id="appointments"></div>
+
+</div>
+
+<footer>
+    <p>© 2026 City Care Hospital | All Rights Reserved</p>
+</footer>
+
+<script>
+
+const doctors = [
+    {
+        name: "Dr. Anil Kumar",
+        specialization: "Cardiologist",
+        availability: "10 AM - 2 PM"
+    },
+    {
+        name: "Dr. Priya Sharma",
+        specialization: "Dermatologist",
+        availability: "11 AM - 4 PM"
+    },
+    {
+        name: "Dr. Rahul Reddy",
+        specialization: "Neurologist",
+        availability: "9 AM - 1 PM"
+    }
+];
+
+function displayDoctors(list) {
+    const area = document.getElementById("doctorList");
+
+    area.innerHTML = "";
+
+    list.forEach(doc => {
+        area.innerHTML += `
+            <div class="doctor">
+                <h3>${doc.name}</h3>
+                <p>Specialization: ${doc.specialization}</p>
+                <p>Available: ${doc.availability}</p>
+            </div>
+        `;
+    });
+}
+
+function searchDoctors() {
+    const value = document.getElementById("search")
+        .value.toLowerCase();
+
+    const filtered = doctors.filter(doc =>
+        doc.name.toLowerCase().includes(value) ||
+        doc.specialization.toLowerCase().includes(value)
+    );
+
+    displayDoctors(filtered);
+}
+
+function bookAppointment(event) {
+    event.preventDefault();
+
+    const appointment = {
+        patient: document.getElementById("patient").value,
+        doctor: document.getElementById("doctor").value,
+        date: document.getElementById("date").value,
+        time: document.getElementById("time").value
+    };
+
+    const appointments = JSON.parse(
+        localStorage.getItem("appointments") || "[]"
+    );
+
+    appointments.push(appointment);
+
+    localStorage.setItem(
+        "appointments",
+        JSON.stringify(appointments)
+    );
+
+    alert("Appointment booked successfully!");
+
+    displayAppointments();
+    event.target.reset();
+}
+
+function displayAppointments() {
+    const appointments = JSON.parse(
+        localStorage.getItem("appointments") || "[]"
+    );
+
+    const area = document.getElementById("appointments");
+
+    area.innerHTML = "";
+
+    appointments.forEach((a, index) => {
+        area.innerHTML += `
+            <div class="doctor">
+                <p>Patient: ${a.patient}</p>
+                <p>Doctor: ${a.doctor}</p>
+                <p>Date: ${a.date}</p>
+                <p>Time: ${a.time}</p>
+                <button onclick="cancelAppointment(${index})">
+                    Cancel Appointment
+                </button>
+            </div>
+        `;
+    });
+}
+
+function cancelAppointment(index) {
+    const appointments = JSON.parse(
+        localStorage.getItem("appointments") || "[]"
+    );
+
+    appointments.splice(index, 1);
+
+    localStorage.setItem(
+        "appointments",
+        JSON.stringify(appointments)
+    );
+
+    displayAppointments();
+}
+
+displayDoctors(doctors);
+displayAppointments();
+
+</script>
+
+</body>
+</html>
